@@ -2,7 +2,7 @@ import sys
 import socket
 import time
 from random import randint
-
+from Node import Node
 t1 = 0.0  # the amount of time remaining to player 1
 t2 = 0.0  # the amount of time remaining to player 2
 
@@ -75,10 +75,13 @@ def playGame(me, thehost):
 
         if status[0] == me:
             print "Move"
-            validMoves = getValidMoves(status[1], me)
+
+            rootNode = Node(state, True, None)
+
+            validMoves = rootNode.getValidMoves(status[1], me)
             print validMoves
 
-            myMove = move(validMoves)
+            myMove = rootNode.bestMove
 
             sel = str(validMoves[myMove][0]) + "\n" + str(validMoves[myMove][1]) + "\n"
             print "<" + sel + ">"

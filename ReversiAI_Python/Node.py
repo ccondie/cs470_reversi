@@ -5,6 +5,7 @@ class Node(object):
         self.parent = parent
         self.bestVal = 0  # assign to value of the state
         self.bestMove = [None, None]
+        self.calc_value()
 
     def calc_value(self):
         # get possible moves
