@@ -1,22 +1,37 @@
 class Node(object):
-    def __init__(self, state, isMax, parent):
+    def __init__(self, state, isMax, parent, roundNum):
         self.state = state
         self.isMax = isMax
         self.parent = parent
+        self.roundNum = roundNum
+
         self.bestVal = 0  # assign to value of the state
         self.bestMove = [None, None]
         self.calc_value()
 
     def calc_value(self):
         # get possible moves
+        validMoves = self.getValidMoves(self.roundNum)
 
         # for each possible move
-        # at least once - get value of move
-        #
-        # if value is 'WORSE?' than our parents best ... break
-        # update personal best
+        for move in validMoves:
+            # at least once - get value of move
+            moveVal = self.calc_value()
 
-        pass
+            # if value is 'WORSE?' than our parents best ... break
+            if moveVal > self.parent.bestVal:
+                break
+            else:
+                # update personal best
+                self.bestVal = moveVal
+                self.bestMove = move
+
+
+
+
+
+
+
 
     """
     FROM AIguy

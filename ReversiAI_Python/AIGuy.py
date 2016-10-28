@@ -76,7 +76,7 @@ def playGame(me, thehost):
         if status[0] == me:
             print "Move"
 
-            rootNode = Node(state, True, None)
+            rootNode = Node(state, True, None, status[1])
 
             validMoves = rootNode.getValidMoves(status[1], me)
             print validMoves
