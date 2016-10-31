@@ -1,4 +1,5 @@
 from copy import deepcopy
+import logging
 
 
 class Node(object):
@@ -13,6 +14,7 @@ class Node(object):
 
         self.bestVal = -64  # assign to value of the state
         self.bestMove = [None, None]
+        logging.basicConfig(filename='player' + str(self.me) + '.log', level=logging.DEBUG)
 
     def calc_best_move(self):
         """
@@ -20,20 +22,18 @@ class Node(object):
         available from the set of valid moves
         :return:
         """
-        print('starting calc_best_move - ' + 'depth:' + str(self.depth))
+        logging.info('starting calc_best_move - roundNum:' + str(self.roundNum) + ' depth:' + str(self.depth))
         # if this node is a designated leaf node
         if self.depth == 0:
             # return the value of this state
-            print('handling depth zero case')
             return self.state_value(), self.moveMade
 
         # get possible moves
-        print('getting valid moves')
         validMoves = self.getValidMoves(self.roundNum, self.me)
+        logging.info('validMoves: ' + str(validMoves))
 
         # for each possible move
         for move in validMoves:
-            print('validMove: ' + str(move))
             # at least once - create a node and calculate it's value
             temp_state = deepcopy(self.state)
             temp_state[move[0]][move[1]] = self.me
@@ -42,13 +42,12 @@ class Node(object):
 
             move_node = Node(temp_state, move, temp_isMax, self, temp_roundNum, self.me, self.depth - 1)
             move_res = move_node.calc_best_move()
-            print('moveValue: ' + str(move_res))
 
             if self.parent is None:
                 # Handle the decision making of the root node
                 if move_res[0] >= self.bestVal:
                     self.bestVal = move_res[0]
-                    self.bestMove = move_res[1]
+                    self.bestMove = move
             else:
                 # Minimize or Maximize based on parent's best value
                 if self.isMax:
@@ -72,6 +71,7 @@ class Node(object):
                         self.bestVal = move_res[0]
                         self.bestMove = move_res[1]
 
+        logging.info('returning move: ' + str(self.bestMove))
         return self.bestVal, self.bestMove
 
     def state_value(self):
