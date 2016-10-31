@@ -50,13 +50,27 @@ class Node(object):
                     self.bestVal = move_res[0]
                     self.bestMove = move_res[1]
             else:
-                # if value is 'WORSE?' than our parents best ... break
-                if move_res[0] >= self.parent.bestVal:
-                    return self.bestVal, self.bestMove
+                # Minimize or Maximize based on parent's best value
+                if self.isMax:
+                    # I am a max node and my parent is a min node
+                    if move_res[0] >= self.parent.bestVal:
+                        # if my move is greater than my parents, no matter how high I get they will never choose me
+                        # I will now return the best choice out of all my turns
+                        return self.bestVal, self.bestMove
+                    else:
+                        # update personal best
+                        self.bestVal = move_res[0]
+                        self.bestMove = move_res[1]
                 else:
-                    # update personal best
-                    self.bestVal = move_res[0]
-                    self.bestMove = move_res[1]
+                    # I am a min node and my parent is a max node
+                    if move_res[0] <= self.parent.bestVal:
+                        # if my move is less than my parents, no matter how low I get it, they will never choose me
+                        # I will now return the best choice out of all my turns
+                        return self.bestVal, self.bestMove
+                    else:
+                        # update personal best
+                        self.bestVal = move_res[0]
+                        self.bestMove = move_res[1]
 
         return self.bestVal, self.bestMove
 
@@ -71,10 +85,8 @@ class Node(object):
         for el in self.state:
             for el2 in el:
                 if el2 == 1:
-                    print('count one')
                     one_count += 1
                 if el2 == 2:
-                    print('count two')
                     two_count += 1
 
         if self.me == 1:

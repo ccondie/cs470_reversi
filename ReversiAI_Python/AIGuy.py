@@ -77,7 +77,7 @@ def playGame(me, thehost):
         if status[0] == me:
             print "Move"
 
-            rootNode = Node(state, None, True, None, status[1], me, 1)
+            rootNode = Node(state, None, True, None, status[1], me, 2)
             myMove = rootNode.calc_best_move()[1]
 
             sel = str(myMove[0]) + "\n" + str(myMove[1]) + "\n"
