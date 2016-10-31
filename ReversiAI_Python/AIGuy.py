@@ -3,6 +3,7 @@ import socket
 import time
 from random import randint
 from Node import Node
+
 t1 = 0.0  # the amount of time remaining to player 1
 t2 = 0.0  # the amount of time remaining to player 2
 
@@ -47,7 +48,7 @@ def readMessage(sock):
         sys.exit()
 
     roundNum = int(mensaje[1])
-    print "Round: " + str(roundNum)
+    # print "Round: " + str(roundNum)
     t1 = float(mensaje[2])  # update of the amount of time available to player 1
     # print t1
     t2 = float(mensaje[3])  # update of the amount of time available to player 2
@@ -58,7 +59,7 @@ def readMessage(sock):
         for j in range(8):
             state[i][j] = int(mensaje[count])
             count += 1
-        print state[i]
+        # print state[i]
 
     return turn, roundNum
 
@@ -76,14 +77,11 @@ def playGame(me, thehost):
         if status[0] == me:
             print "Move"
 
-            rootNode = Node(state, True, None, status[1])
+            rootNode = Node(state, None, True, None, status[1], me, 1)
+            myMove = rootNode.calc_best_move()[1]
 
-            validMoves = rootNode.getValidMoves(status[1], me)
-            print validMoves
+            sel = str(myMove[0]) + "\n" + str(myMove[1]) + "\n"
 
-            myMove = rootNode.bestMove
-
-            sel = str(validMoves[myMove][0]) + "\n" + str(validMoves[myMove][1]) + "\n"
             print "<" + sel + ">"
             sock.send(sel)
             print "sent the message"
