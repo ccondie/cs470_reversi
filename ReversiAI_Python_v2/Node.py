@@ -22,21 +22,31 @@ class Node(object):
         available from the set of valid moves
         :return:
         """
-        logging.info('starting calc_best_move - roundNum:' + str(self.roundNum) + ' depth:' + str(self.depth))
-        # if this node is a designated leaf node
-        if self.depth == 0:
-            # return the value of this state
-            return self.state_value(), self.moveMade
 
         # get possible moves
         validMoves = self.getValidMoves(self.roundNum, self.me)
-        logging.info('validMoves: ' + str(validMoves))
+        # if this node is a designated leaf node
+        if self.depth == 0 or len(validMoves) == 0:
+            # return the value of this state
+            return self.state_value(), self.moveMade
+
+        if self.me == 1:
+            my_id = 0
+            their_id = 1
+        else:
+            my_id = 1
+            their_id = 0
 
         # for each possible move
         for move in validMoves:
             # at least once - create a node and calculate it's value
             temp_state = deepcopy(self.state)
-            temp_state[move[0]][move[1]] = self.me
+
+            if self.isMax:
+                temp_state = self.changeColors(temp_state, move[0], move[1], my_id)
+            else:
+                temp_state = self.changeColors(temp_state, move[0], move[1], their_id)
+
             temp_isMax = not self.isMax
             temp_roundNum = self.roundNum + 1
 
@@ -74,6 +84,13 @@ class Node(object):
         logging.info('returning move: ' + str(self.bestMove))
         return self.bestVal, self.bestMove
 
+    def make_move(self, pre_state, move, player_id):
+        """
+        takes in a state and a move, returns the state after the move is made
+        :return:
+        """
+        return self.changeColors(pre_state, move[0], move[1], player_id)
+
     def state_value(self):
         """
         calculates the difference between the white and black pieces and returns the "value" of the board
@@ -82,8 +99,8 @@ class Node(object):
         """
         one_count = 0
         two_count = 0
-        cornerVal = 50
-        sideVal = 10
+        cornerVal = 1
+        sideVal = 1
         basicVal = 1
 
         # top left corner
@@ -153,6 +170,73 @@ class Node(object):
             return 0
 
     """
+    OTHER
+    """
+
+    def changeColors(self, start_state, row, col, turn):
+        for incx in range(-1, 2):
+            for incy in range(-1, 2):
+                if incx == 0 and incy == 0:
+                    continue
+                start_state = self.check_direction(start_state, row, col, incx, incy, turn)
+        for el in start_state:
+            logging.debug(str(el))
+        logging.debug(' ')
+        logging.debug(' ')
+        return start_state
+
+    def check_direction(self, start_state, row, col, incx, incy, turn):
+        sequence = []
+        end_state = deepcopy(start_state)
+        for i in range(1, 8):
+            r = row + incy * i
+            c = col + incx * i
+
+            if (r < 0) or (r > 7) or (c < 0) or (c > 7):
+                break
+
+            sequence.append(self.state[r][c])
+
+        count = 0
+        for i in range(len(sequence)):
+            if turn == 0:
+                if sequence[i] == 2:
+                    count += 1
+                else:
+                    if sequence[i] == 1 and count > 0:
+                        count = 20
+                    break
+            else:
+                if sequence[i] == 1:
+                    count += 1
+                else:
+                    if sequence[i] == 2 and count > 0:
+                        count = 20
+                    break
+
+        if count > 10:
+            if turn == 0:
+                i = 1
+                r = row + incy * i
+                c = col + incx * i
+                while (end_state[r][c] == 2):
+                    end_state[r][c] = 1
+                    i += 1
+                    r = row + incy * i
+                    c = col + incx * i
+            else:
+                i = 1
+                r = row + incy * i
+                c = col + incx * i
+                while (end_state[r][c] == 1):
+                    end_state[r][c] = 2
+                    i += 1
+                    r = row + incy * i
+                    c = col + incx * i
+
+        return end_state
+
+    """
     FROM AIguy
     """
 
@@ -183,7 +267,6 @@ class Node(object):
                     if (sequence[i] == 2) and (count > 0):
                         return True
                     break
-
         return False
 
     def couldBe(self, row, col, me):
