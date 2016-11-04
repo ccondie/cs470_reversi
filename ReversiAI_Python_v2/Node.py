@@ -1,6 +1,7 @@
 from copy import deepcopy
 import logging
 import time
+import random
 
 
 class Node(object):
@@ -13,9 +14,15 @@ class Node(object):
         self.me = me
         self.depth = depth
 
-        self.bestVal = self.state_value()  # assign to value of the state
+        self.bestVal = None  # assign to value of the state
         self.bestMove = [None, None]
-        logging.basicConfig(filename='player' + str(self.me) + '_' + str(time.time()) + '.log', level=logging.DEBUG)
+        # logging.basicConfig(filename='player' + str(self.me) + '_' + str(time.time()) + '.log', level=logging.DEBUG)
+
+    def setParentBest(self, value):
+        if self.bestVal is None:
+            self.bestVal = value
+        if self.parent is not None and self.parent.bestVal is None:
+            self.parent.setParentBest(value)
 
     def calc_best_move(self):
         """
@@ -23,23 +30,10 @@ class Node(object):
         available from the set of valid moves
         :return:
         """
-        if self.isMax:
-            logging.info('MAX WITH THIS STARTING STATE at depth ' + str(self.depth))
-        else:
-            logging.info('MIN WITH THIS STARTING STATE at depth ' + str(self.depth))
-
-        # for row in reversed(self.state):
-        #     row_str = []
-        #     for el in row:
-        #         if el == 0:
-        #             row_str.append(u'\u2B1A')
-        #         elif el == 1:
-        #             row_str.append(u'\u2B1B')
-        #         else:
-        #             row_str.append(u'\u2B1C')
-        #         row_str.append(' ')
-        #     logging.info(''.join(row_str))
-        # logging.info(' ')
+        # if self.isMax:
+        #     logging.info('MAX WITH THIS STARTING STATE at depth ' + str(self.depth))
+        # else:
+        #     logging.info('MIN WITH THIS STARTING STATE at depth ' + str(self.depth))
 
         if self.me == 1:
             my_id = 0
@@ -54,12 +48,36 @@ class Node(object):
         else:
             validMoves = self.getValidMoves(self.roundNum, their_id + 1)
 
+        if self.roundNum < 4:
+            return 0, random.choice(validMoves)
+
         # if this node is a designated leaf node
         if self.depth == 0 or len(validMoves) == 0:
             # return the value of this state
+            self.bestVal = self.state_value()
+            if self.parent is not None and self.parent.bestVal is None:
+                self.parent.setParentBest(self.state_value())
+
+        # for row in reversed(self.state):
+        #     row_str = []
+        #     for el in row:
+        #         if el == 0:
+        #             row_str.append(u'\u2B1A')
+        #         elif el == 1:
+        #             row_str.append(u'\u2B1C')
+        #         else:
+        #             row_str.append(u'\u2B1B')
+        #         row_str.append(' ')
+        #     logging.info(''.join(row_str))
+        # logging.info("Current best value: " + str(self.bestVal))
+        # if self.parent is not None:
+        #     logging.info("Parent best value: " + str(self.parent.bestVal))
+        # logging.info(' ')
+
+        if self.depth == 0 or len(validMoves) == 0:
+            # return the value of this state
+            # logging.info("Leaf node returning " + str(self.state_value()))
             return self.state_value(), None
-
-
 
         # for each possible move[row][col]
         for move in validMoves:
@@ -90,26 +108,30 @@ class Node(object):
                 # Minimize or Maximize based on parent's best value
                 if self.isMax:
                     # I am a max node and my parent is a min node
-                    if move_res[0] >= self.parent.bestVal:
+                    if move_res[0] > self.parent.bestVal:
                         # if my move is greater than my parents, no matter how high I get they will never choose me
                         # I will now return the best choice out of all my turns
-                        logging.error('pruning a MAX node')
+                        # logging.error('pruning a MAX node at depth ' + str(self.depth) + " because best value is " + str(move_res[0]))
                         return self.bestVal, None
-                    else:
+                    elif move_res[0] > self.bestVal:
                         # update personal best
+                        # logging.info("Max updating best value at depth " + str(self.depth) + " from " + str(self.bestVal) + " to " + str(move_res[0]))
                         self.bestVal = move_res[0]
                 else:
                     # I am a min node and my parent is a max node
-                    if move_res[0] <= self.parent.bestVal:
+                    if move_res[0] < self.parent.bestVal:
                         # if my move is less than my parents, no matter how low I get it, they will never choose me
                         # I will now return the best choice out of all my turns
-                        logging.error('pruning a MIN node')
+                        # logging.error('pruning a MIN node at depth ' + str(self.depth) + " because best value is " + str(move_res[0]))
                         return self.bestVal, None
-                    else:
+                    elif move_res[0] < self.bestVal:
                         # update personal best
+                        # logging.info("Min updating best value at depth " + str(self.depth) + " from " + str(self.bestVal) + " to " + str(move_res[0]))
                         self.bestVal = move_res[0]
 
-        logging.info('returning move: ' + str(self.bestMove) + '+++++++++++++++++++++++++++++++++++')
+        # if self.parent is None:
+            # logging.info("BEST SOLUTIONS HAS BEEN FOUND")
+            # logging.info('returning move: ' + str(self.bestMove) + '+++++++++++++++++++++++++++++++++++')
         return self.bestVal, self.bestMove
 
     def make_move(self, pre_state, move, player_id):
