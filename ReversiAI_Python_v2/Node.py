@@ -29,7 +29,16 @@ class Node(object):
             logging.info('MIN WITH THIS STARTING STATE at depth ' + str(self.depth))
 
         for row in reversed(self.state):
-            logging.info(str(row))
+            row_str = []
+            for el in row:
+                if el == 0:
+                    row_str.append(u'\u2B1A')
+                elif el == 1:
+                    row_str.append(u'\u2B1B')
+                else:
+                    row_str.append(u'\u2B1C')
+                row_str.append(' ')
+            logging.info(''.join(row_str))
         logging.info(' ')
 
         if self.me == 1:
@@ -89,7 +98,6 @@ class Node(object):
                     else:
                         # update personal best
                         self.bestVal = move_res[0]
-                        self.bestMove = None
                 else:
                     # I am a min node and my parent is a max node
                     if move_res[0] <= self.parent.bestVal:
@@ -100,7 +108,6 @@ class Node(object):
                     else:
                         # update personal best
                         self.bestVal = move_res[0]
-                        self.bestMove = None
 
         logging.info('returning move: ' + str(self.bestMove) + '+++++++++++++++++++++++++++++++++++')
         return self.bestVal, self.bestMove
