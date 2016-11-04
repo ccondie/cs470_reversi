@@ -24,9 +24,9 @@ class Node(object):
         :return:
         """
         if self.isMax:
-            logging.info('MAX WITH THIS STARTING STATE')
+            logging.info('MAX WITH THIS STARTING STATE at depth ' + str(self.depth))
         else:
-            logging.info('MIN WITH THIS STARTING STATE')
+            logging.info('MIN WITH THIS STARTING STATE at depth ' + str(self.depth))
 
         for row in reversed(self.state):
             logging.info(str(row))
@@ -81,6 +81,7 @@ class Node(object):
                     if move_res[0] >= self.parent.bestVal:
                         # if my move is greater than my parents, no matter how high I get they will never choose me
                         # I will now return the best choice out of all my turns
+                        logging.error('pruning a MAX node')
                         return self.bestVal, self.bestMove
                     else:
                         # update personal best
@@ -91,6 +92,7 @@ class Node(object):
                     if move_res[0] <= self.parent.bestVal:
                         # if my move is less than my parents, no matter how low I get it, they will never choose me
                         # I will now return the best choice out of all my turns
+                        logging.error('pruning a MIN node')
                         return self.bestVal, self.bestMove
                     else:
                         # update personal best
