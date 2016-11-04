@@ -32,19 +32,25 @@ class Node(object):
             logging.info(str(row))
         logging.info(' ')
 
-        # get possible moves
-        validMoves = self.getValidMoves(self.roundNum, self.me)
-        # if this node is a designated leaf node
-        if self.depth == 0 or len(validMoves) == 0:
-            # return the value of this state
-            return self.state_value(), self.moveMade
-
         if self.me == 1:
             my_id = 0
             their_id = 1
         else:
             my_id = 1
             their_id = 0
+
+        # get possible moves
+        if self.isMax:
+            validMoves = self.getValidMoves(self.roundNum, my_id + 1)
+        else:
+            validMoves = self.getValidMoves(self.roundNum, their_id + 1)
+
+        # if this node is a designated leaf node
+        if self.depth == 0 or len(validMoves) == 0:
+            # return the value of this state
+            return self.state_value(), self.moveMade
+
+
 
         # for each possible move[row][col]
         for move in validMoves:
