@@ -58,15 +58,12 @@ class Node(object):
             temp_state = deepcopy(self.state)
 
             # make the move onto the given state
-            if self.isMax:
-                temp_state[move[0]][move[1]] = my_id
-            else:
-                temp_state[move[0]][move[1]] = their_id
-
             # change the captured stones
             if self.isMax:
+                temp_state[move[0]][move[1]] = my_id
                 temp_state = self.make_move(temp_state, move, my_id)
             else:
+                temp_state[move[0]][move[1]] = their_id
                 temp_state = self.make_move(temp_state, move, their_id)
 
             next_isMax = not self.isMax
@@ -124,8 +121,8 @@ class Node(object):
         """
         one_count = 0
         two_count = 0
-        cornerVal = 1
-        sideVal = 1
+        cornerVal = 10
+        sideVal = 5
         basicVal = 1
 
         # top left corner
