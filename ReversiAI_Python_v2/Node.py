@@ -48,7 +48,7 @@ class Node(object):
         # if this node is a designated leaf node
         if self.depth == 0 or len(validMoves) == 0:
             # return the value of this state
-            return self.state_value(), self.moveMade
+            return self.state_value(), None
 
 
 
@@ -85,22 +85,22 @@ class Node(object):
                         # if my move is greater than my parents, no matter how high I get they will never choose me
                         # I will now return the best choice out of all my turns
                         logging.error('pruning a MAX node')
-                        return self.bestVal, self.bestMove
+                        return self.bestVal, None
                     else:
                         # update personal best
                         self.bestVal = move_res[0]
-                        self.bestMove = move_res[1]
+                        self.bestMove = None
                 else:
                     # I am a min node and my parent is a max node
                     if move_res[0] <= self.parent.bestVal:
                         # if my move is less than my parents, no matter how low I get it, they will never choose me
                         # I will now return the best choice out of all my turns
                         logging.error('pruning a MIN node')
-                        return self.bestVal, self.bestMove
+                        return self.bestVal, None
                     else:
                         # update personal best
                         self.bestVal = move_res[0]
-                        self.bestMove = move_res[1]
+                        self.bestMove = None
 
         logging.info('returning move: ' + str(self.bestMove) + '+++++++++++++++++++++++++++++++++++')
         return self.bestVal, self.bestMove
