@@ -1,5 +1,6 @@
 from copy import deepcopy
 import logging
+import time
 
 
 class Node(object):
@@ -14,7 +15,7 @@ class Node(object):
 
         self.bestVal = -64  # assign to value of the state
         self.bestMove = [None, None]
-        logging.basicConfig(filename='player' + str(self.me) + '.log', level=logging.DEBUG)
+        logging.basicConfig(filename='player' + str(self.me) + '_' + str(time.time()) + '.log', level=logging.DEBUG)
 
     def calc_best_move(self):
         """
@@ -22,6 +23,14 @@ class Node(object):
         available from the set of valid moves
         :return:
         """
+        if self.isMax:
+            logging.info('MAX WITH THIS STARTING STATE')
+        else:
+            logging.info('MIN WITH THIS STARTING STATE')
+
+        for row in reversed(self.state):
+            logging.info(str(row))
+        logging.info(' ')
 
         # get possible moves
         validMoves = self.getValidMoves(self.roundNum, self.me)
@@ -37,20 +46,27 @@ class Node(object):
             my_id = 1
             their_id = 0
 
-        # for each possible move
+        # for each possible move[row][col]
         for move in validMoves:
             # at least once - create a node and calculate it's value
             temp_state = deepcopy(self.state)
 
+            # make the move onto the given state
             if self.isMax:
-                temp_state = self.changeColors(temp_state, move[0], move[1], my_id)
+                temp_state[move[0]][move[1]] = my_id
             else:
-                temp_state = self.changeColors(temp_state, move[0], move[1], their_id)
+                temp_state[move[0]][move[1]] = their_id
 
-            temp_isMax = not self.isMax
-            temp_roundNum = self.roundNum + 1
+            # change the captured stones
+            if self.isMax:
+                temp_state = self.make_move(temp_state, move, my_id)
+            else:
+                temp_state = self.make_move(temp_state, move, their_id)
 
-            move_node = Node(temp_state, move, temp_isMax, self, temp_roundNum, self.me, self.depth - 1)
+            next_isMax = not self.isMax
+            next_roundNum = self.roundNum + 1
+
+            move_node = Node(temp_state, move, next_isMax, self, next_roundNum, self.me, self.depth - 1)
             move_res = move_node.calc_best_move()
 
             if self.parent is None:
@@ -81,7 +97,7 @@ class Node(object):
                         self.bestVal = move_res[0]
                         self.bestMove = move_res[1]
 
-        logging.info('returning move: ' + str(self.bestMove))
+        logging.info('returning move: ' + str(self.bestMove) + '+++++++++++++++++++++++++++++++++++')
         return self.bestVal, self.bestMove
 
     def make_move(self, pre_state, move, player_id):
@@ -89,6 +105,7 @@ class Node(object):
         takes in a state and a move, returns the state after the move is made
         :return:
         """
+        pre_state[move[0]][move[1]] = player_id + 1
         return self.changeColors(pre_state, move[0], move[1], player_id)
 
     def state_value(self):
@@ -179,10 +196,10 @@ class Node(object):
                 if incx == 0 and incy == 0:
                     continue
                 start_state = self.check_direction(start_state, row, col, incx, incy, turn)
-        for el in start_state:
-            logging.debug(str(el))
-        logging.debug(' ')
-        logging.debug(' ')
+        # for el in start_state:
+        #     logging.debug(str(el))
+        # logging.debug(' ')
+        # logging.debug(' ')
         return start_state
 
     def check_direction(self, start_state, row, col, incx, incy, turn):
