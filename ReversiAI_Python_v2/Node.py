@@ -13,7 +13,7 @@ class Node(object):
         self.me = me
         self.depth = depth
 
-        self.bestVal = -64  # assign to value of the state
+        self.bestVal = self.state_value()  # assign to value of the state
         self.bestMove = [None, None]
         logging.basicConfig(filename='player' + str(self.me) + '_' + str(time.time()) + '.log', level=logging.DEBUG)
 
@@ -28,18 +28,18 @@ class Node(object):
         else:
             logging.info('MIN WITH THIS STARTING STATE at depth ' + str(self.depth))
 
-        for row in reversed(self.state):
-            row_str = []
-            for el in row:
-                if el == 0:
-                    row_str.append(u'\u2B1A')
-                elif el == 1:
-                    row_str.append(u'\u2B1B')
-                else:
-                    row_str.append(u'\u2B1C')
-                row_str.append(' ')
-            logging.info(''.join(row_str))
-        logging.info(' ')
+        # for row in reversed(self.state):
+        #     row_str = []
+        #     for el in row:
+        #         if el == 0:
+        #             row_str.append(u'\u2B1A')
+        #         elif el == 1:
+        #             row_str.append(u'\u2B1B')
+        #         else:
+        #             row_str.append(u'\u2B1C')
+        #         row_str.append(' ')
+        #     logging.info(''.join(row_str))
+        # logging.info(' ')
 
         if self.me == 1:
             my_id = 0
