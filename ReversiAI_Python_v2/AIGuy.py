@@ -65,7 +65,7 @@ def readMessage(sock):
 
 
 # main function that (1) establishes a connection with the server, and then plays whenever it is this player's turn
-def playGame(me, thehost):
+def playGame(me, thehost, searchDepth):
     # create a random number generator
 
     sock = initClient(me, thehost)
@@ -77,7 +77,7 @@ def playGame(me, thehost):
         if status[0] == me:
             print "Move"
 
-            rootNode = Node(state, None, True, None, status[1], me, 100)
+            rootNode = Node(state, None, True, None, status[1], me, searchDepth)
             myMove = rootNode.calc_best_move()[1]
 
             sel = str(myMove[0]) + "\n" + str(myMove[1]) + "\n"
@@ -94,10 +94,11 @@ def playGame(me, thehost):
 # call: python AIGuy.py [ipaddress] [player_number]
 #   ipaddress is the ipaddress on the computer the server was launched on.  Enter "localhost" if it is on the same computer
 #   player_number is 1 (for the black player) and 2 (for the white player)
+#   searchDepth
 if __name__ == "__main__":
     print 'Number of arguments:', len(sys.argv), 'arguments.'
     print 'Argument List:', str(sys.argv)
 
     print str(sys.argv[1])
 
-    playGame(int(sys.argv[2]), sys.argv[1])
+    playGame(int(sys.argv[2]), sys.argv[1], sys.argv[3])
