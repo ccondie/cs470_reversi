@@ -129,9 +129,9 @@ class Node(object):
                         # logging.info("Min updating best value at depth " + str(self.depth) + " from " + str(self.bestVal) + " to " + str(move_res[0]))
                         self.bestVal = move_res[0]
 
-        # if self.parent is None:
-            # logging.info("BEST SOLUTIONS HAS BEEN FOUND")
-            # logging.info('returning move: ' + str(self.bestMove) + '+++++++++++++++++++++++++++++++++++')
+                        # if self.parent is None:
+                        # logging.info("BEST SOLUTIONS HAS BEEN FOUND")
+                        # logging.info('returning move: ' + str(self.bestMove) + '+++++++++++++++++++++++++++++++++++')
         return self.bestVal, self.bestMove
 
     def make_move(self, pre_state, move, player_id):
@@ -142,6 +142,9 @@ class Node(object):
         pre_state[move[0]][move[1]] = player_id + 1
         return self.changeColors(pre_state, move[0], move[1], player_id)
 
+    def xy_i(self, x, y):
+        pass
+
     def state_value(self):
         """
         calculates the difference between the white and black pieces and returns the "value" of the board
@@ -150,10 +153,13 @@ class Node(object):
         """
         one_count = 0
         two_count = 0
-        cornerVal = 10
-        sideVal = 5
-        basicVal = 1
 
+        cornerVal = 15
+        sideVal = 7
+        basicVal = 3
+        demonRingVal = 1
+
+        """CORNERS"""
         # top left corner
         if self.state[0][0] == 1:
             one_count += cornerVal
@@ -178,6 +184,7 @@ class Node(object):
         if self.state[7][7] == 2:
             two_count += cornerVal
 
+        """EDGES"""
         # top row
         for cell in range(1, 6):
             if self.state[cell][0] == 1:
@@ -205,7 +212,37 @@ class Node(object):
                 one_count += sideVal
             if self.state[7][cell] == 2:
                 two_count += sideVal
+                
+        """DEMON RING"""
+        # top row
+        for cell in range(1, 6):
+            if self.state[cell][1] == 1:
+                one_count += demonRingVal
+            if self.state[cell][1] == 2:
+                two_count += demonRingVal
 
+        # bottom row
+        for cell in range(1, 6):
+            if self.state[cell][6] == 1:
+                one_count += demonRingVal
+            if self.state[cell][6] == 2:
+                two_count += demonRingVal
+
+        # left column
+        for cell in range(1, 6):
+            if self.state[1][cell] == 1:
+                one_count += demonRingVal
+            if self.state[1][cell] == 2:
+                two_count += demonRingVal
+
+        # right column
+        for cell in range(1, 6):
+            if self.state[6][cell] == 1:
+                one_count += demonRingVal
+            if self.state[6][cell] == 2:
+                two_count += demonRingVal
+                
+        """MIDDLE FILL"""
         for y in range(1, 6):
             for x in range(1, 6):
                 if self.state[x][y] == 1:
