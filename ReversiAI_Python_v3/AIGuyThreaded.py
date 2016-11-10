@@ -2,22 +2,27 @@ import sys
 import socket
 import time
 from random import randint
-from Node import Node
+from ReversiAI_Python_v3 import Node
+from threading import Thread
 
 
-class AiGuy(object):
+class AiGuyThread(Thread):
     # ADAPTED FROM MAIN CALL
     # call: python AIGuy.py [ipaddress] [player_number]
     #   ipaddress is the ipaddress on the computer the server was launched on.  Enter "localhost" if it is on the same computer
     #   player_number is 1 (for the black player) and 2 (for the white player)
     #   searchDepth
     def __init__(self, ipadr, player_num, search_depth):
+        Thread.__init__(self)
         self.t1 = 0.0  # the amount of time remaining to player 1
         self.t2 = 0.0  # the amount of time remaining to player 2
         self.state = [[0 for x in range(8)] for y in
                       range(8)]  # state[0][0] is the bottom left corner of the board (on the GUI)
 
         self.playGame(int(player_num), ipadr, search_depth)
+
+    def run(self):
+        pass
 
     # You should modify this function
     # validMoves is a list of valid locations that you could place your "stone" on this turn
@@ -27,6 +32,7 @@ class AiGuy(object):
         myMove = randint(0, len(validMoves) - 1)
 
         return myMove
+
 
     # establishes a connection with the server
     def init_client(self, me, thehost):
@@ -40,6 +46,7 @@ class AiGuy(object):
 
         return sock
 
+
     # reads messages from the server
     def read_message(self, sock):
         message = sock.recv(1024).split("\n")
@@ -51,7 +58,7 @@ class AiGuy(object):
             time.sleep(1)
             sys.exit()
 
-        roundNum = int(message[1])
+        round_num = int(message[1])
         self.t1 = float(message[2])  # update of the amount of time available to player 1
         self.t2 = float(message[3])  # update of the amount of time available to player 2
 
@@ -61,7 +68,8 @@ class AiGuy(object):
                 self.state[i][j] = int(message[count])
                 count += 1
 
-        return turn, roundNum
+        return turn, round_num
+
 
     # main function that (1) establishes a connection with the server, and then plays whenever it is this player's turn
     def playGame(self, me, thehost, searchDepth):
@@ -91,4 +99,4 @@ class AiGuy(object):
 
 
 if __name__ == '__main__':
-    ai = AiGuy(sys.argv[1], sys.argv[2], sys.argv[3])
+    ai = AiGuyThread(sys.argv[1], sys.argv[2], sys.argv[3])

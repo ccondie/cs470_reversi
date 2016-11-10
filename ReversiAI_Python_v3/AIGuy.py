@@ -2,7 +2,7 @@ import sys
 import socket
 import time
 from random import randint
-from Node import Node
+from ReversiAI_Python_v3 import Node
 
 t1 = 0.0  # the amount of time remaining to player 1
 t2 = 0.0  # the amount of time remaining to player 2
